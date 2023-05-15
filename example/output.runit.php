@@ -3,9 +3,10 @@
 namespace Asrunit\Example;
 
 use Asrunit\Attribute\Task;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[Task(description: "A simple command that use output interface")]
-function output(OutputInterface $output) {
-    $output->writeln('output from symfony interface');
+#[Task(description: "A simple command that use symfony style")]
+function output(SymfonyStyle $io) {
+    $value = $io->ask('Tell me something');
+    $io->writeln('You said: ' . $value);
 }

@@ -5,8 +5,11 @@ namespace Asrunit;
 class Context extends \ArrayObject {
     public string $currentDirectory;
 
-    public function __construct() {
-        parent::__construct([], \ArrayObject::ARRAY_AS_PROPS);
+    public function __construct(
+        public array $data = [],
+        public array $environment = [],
+    ) {
+        parent::__construct($data, \ArrayObject::ARRAY_AS_PROPS);
 
         $this->currentDirectory = getcwd();
     }

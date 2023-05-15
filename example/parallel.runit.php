@@ -3,7 +3,6 @@
 namespace Asrunit\Example;
 
 use Asrunit\Attribute\Task;
-use Asrunit\Attribute\Description;
 use function Asrunit\exec;
 use function Asrunit\parallel;
 
@@ -31,4 +30,4 @@ function sleep() {
     echo "Foo: $foo\n";
     echo "Bar: $bar\n";
     echo "Duration: $duration\n";
-}g
+}

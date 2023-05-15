@@ -1,0 +1,24 @@
+{
+    "name": "jolicode/asrunit",
+    "description": "Asynchronous task runner",
+    "type": "library",
+    "require": {
+        "jolicode/asynit": "^0.12.0",
+        "amphp/process": "^2.0",
+        "symfony/console": "^6.2",
+        "symfony/finder": "^6.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Asrunit\\": "src/"
+        },
+        "files": ["src/functions.php"]
+    },
+    "authors": [
+        {
+            "name": "Joel Wurtz",
+            "email": "jwurtz@jolicode.com"
+        }
+    ]
+}

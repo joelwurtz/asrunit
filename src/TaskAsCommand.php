@@ -25,8 +25,6 @@ class TaskAsCommand extends Command
     protected function configure(): void
     {
         $this->setDescription($this->commandAttribute->description);
-        $contextNames = implode('|', $this->contextRegistry->getContextsName());
-        $this->addOption('context', null, InputOption::VALUE_REQUIRED, "The context to use ($contextNames)", 'default');
 
         foreach ($this->function->getParameters() as $parameter) {
             $name = strtolower($parameter->getName());

@@ -3,11 +3,10 @@
 namespace Asrunit;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 
 class ApplicationFactory {
     public static function create(): Application {
-        $application = new Application('asrunit');
         $contextRegistry = new ContextRegistry();
         $finder = new TaskFinder($contextRegistry);
         $path = getcwd();
@@ -40,6 +39,12 @@ class ApplicationFactory {
         $contextRegistry->addContext('default', $defaultContext ?? new ContextBuilder(new Attribute\AsContext(default: true, name: 'default'), new \ReflectionFunction(function() {
             return new Context();
         })));
+
+        $application = new Application('asrunit');
+        $contextNames = implode('|', $contextRegistry->getContextsName());
+
+        $inputDefinition = $application->getDefinition();
+        $inputDefinition->addOption(new InputOption('context', null, InputOption::VALUE_REQUIRED, "The context to use ($contextNames)", 'default'));
 
         foreach ($taskBuilders as $taskBuilder) {
             $application->add($taskBuilder->getCommand());

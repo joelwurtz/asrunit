@@ -2,7 +2,7 @@
 
 namespace Asrunit\Example;
 
-use Asrunit\Attribute\Command;
+use Asrunit\Attribute\Task;
 use Asrunit\Attribute\Description;
 use function Asrunit\exec;
 use function Asrunit\parallel;
@@ -21,8 +21,7 @@ function sleep_7() {
     return "bar";
 }
 
-#[Command]
-#[Description("A simple command that sleeps for 5 and 7 seconds in parallel")]
+#[Task(description: "A simple task that sleeps for 5 and 7 seconds in parallel")]
 function sleep() {
     $start = microtime(true);
     [$foo, $bar] = parallel(fn() => sleep_5(), fn() => sleep_7());
@@ -32,4 +31,4 @@ function sleep() {
     echo "Foo: $foo\n";
     echo "Bar: $bar\n";
     echo "Duration: $duration\n";
-}
+}g

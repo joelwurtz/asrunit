@@ -2,23 +2,21 @@
 
 namespace Asrunit;
 
-use Asrunit\Attribute\Description;
+use Asrunit\Attribute\Task as CommandAttribute;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CommandFunction extends Command
+class TaskAsCommand extends Command
 {
-    public function __construct(string|null $namespace, private \ReflectionFunction $function)
+    public function __construct(private CommandAttribute $commandAttribute, private \ReflectionFunction $function)
     {
-        $name = strtolower($function->getShortName());
+        $commandName = $commandAttribute->name;
 
-        $commandName = $name;
-
-        if ($namespace) {
-            $commandName = $namespace . ':' . $commandName;
+        if ($commandAttribute->namespace !== null && $commandAttribute->namespace !== '') {
+            $commandName = $commandAttribute->namespace . ':' . $commandName;
         }
 
         parent::__construct($commandName);
@@ -26,13 +24,7 @@ class CommandFunction extends Command
 
     protected function configure(): void
     {
-        $description = '';
-
-        foreach ($this->function->getAttributes(Description::class) as $attribute) {
-            $description .= $attribute->newInstance()->description;
-        }
-
-        $this->setDescription($description);
+        $this->setDescription($this->commandAttribute->description);
 
         foreach ($this->function->getParameters() as $parameter) {
             $name = strtolower($parameter->getName());

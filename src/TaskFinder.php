@@ -2,16 +2,16 @@
 
 namespace Asrunit;
 
-use Asrunit\Attribute\Command;
+use Asrunit\Attribute\Task;
 use Symfony\Component\Finder\Finder;
 
-class CommandFinder {
+class TaskFinder {
 
-    /** @return CommandFunction[] */
-    public function findCommands(string $path): array
+    /** @return TaskAsCommand[] */
+    public function findTasks(string $path): array
     {
         if (\is_file($path)) {
-            return $this->doFindCommands([$path]);
+            return $this->doFindTasks([$path]);
         }
 
         $finder = Finder::create()
@@ -20,27 +20,27 @@ class CommandFinder {
             ->in($path)
         ;
 
-        return $this->doFindCommands($finder);
+        return $this->doFindTasks($finder);
     }
 
     /**
      * @param iterable<string|\SplFileInfo> $files
      *
-     * @return CommandFunction[]
+     * @return TaskAsCommand[]
      *
      * @throws \ReflectionException
      */
-    private function doFindCommands(iterable $files): array
+    private function doFindTasks(iterable $files): array
     {
         $methods = [];
         $existingFunctions = \get_defined_functions()['user'];
 
         foreach ($files as $file) {
             $path = $file;
-            $name = str_replace('.runit.php', '', $file);
+            $namespace = str_replace('.runit.php', '', $file);
 
             if ($path instanceof \SplFileInfo) {
-                $name = $path->getBasename('.runit.php');
+                $namespace = $path->getBasename('.runit.php');
                 $path = $path->getRealPath();
             }
 
@@ -53,11 +53,21 @@ class CommandFinder {
 
             foreach ($newFunctions as $functionName) {
                 $reflectionFunction = new \ReflectionFunction($functionName);
-                $attributes = $reflectionFunction->getAttributes(Command::class);
+                $attributes = $reflectionFunction->getAttributes(Task::class);
                 $test = null;
 
                 if (count($attributes) > 0) {
-                    $command = new CommandFunction($name, $reflectionFunction);
+                    $taskAttribute = $attributes[0]->newInstance();
+
+                    if ($taskAttribute->name === '') {
+                        $taskAttribute->name = $reflectionFunction->getShortName();
+                    }
+
+                    if ($taskAttribute->namespace === null) {
+                        $taskAttribute->namespace = $namespace;
+                    }
+
+                    $command = new TaskAsCommand($taskAttribute, $reflectionFunction);
                     $methods[] = $command;
                 }
             }

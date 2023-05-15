@@ -2,11 +2,10 @@
 
 namespace Asrunit\Example;
 
-use Asrunit\Attribute\Command;
+use Asrunit\Attribute\Task;
 use Asrunit\Attribute\Description;
 
-#[Command]
-#[Description("A simple command that prints bar, but also executes foo")]
+#[Task(description: "A simple task that prints bar, but also executes foo")]
 function bar() {
     foo();
 

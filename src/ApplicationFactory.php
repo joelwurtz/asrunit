@@ -8,11 +8,11 @@ use Symfony\Component\Finder\Finder;
 class ApplicationFactory {
     public static function create(): Application {
         $application = new Application('asrunit');
-        $finder = new CommandFinder();
+        $finder = new TaskFinder();
         $path = getcwd();
 
         // Find all potential commands
-        $commandMethods = $finder->findCommands($path);
+        $commandMethods = $finder->findTasks($path);
 
         foreach ($commandMethods as $commandMethod) {
             $application->add($commandMethod);

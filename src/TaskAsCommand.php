@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TaskAsCommand extends Command
 {
-    public function __construct(private CommandAttribute $commandAttribute, private \ReflectionFunction $function)
+    public function __construct(private CommandAttribute $commandAttribute, private \ReflectionFunction $function, private ContextRegistry $contextRegistry)
     {
         $commandName = $commandAttribute->name;
 
@@ -25,9 +25,16 @@ class TaskAsCommand extends Command
     protected function configure(): void
     {
         $this->setDescription($this->commandAttribute->description);
+        $contextNames = implode('|', $this->contextRegistry->getContextsName());
+        $this->addOption('context', null, InputOption::VALUE_REQUIRED, "The context to use ($contextNames)", 'default');
 
         foreach ($this->function->getParameters() as $parameter) {
             $name = strtolower($parameter->getName());
+            $type = $parameter->getType();
+
+            if ($type !== null && $type->getName() === Context::class) {
+                continue;
+            }
 
             if ($parameter->isOptional()) {
                 $this->addOption($name, null, InputOption::VALUE_OPTIONAL, '', $parameter->getDefaultValue());
@@ -40,9 +47,21 @@ class TaskAsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $args = [];
+        $contextName = $input->getOption('context');
+        $contextBuilder = $this->contextRegistry->getContext($contextName);
+
+        if ($contextBuilder === null) {
+            throw new \Exception("Context $contextName does not exist");
+        }
 
         foreach ($this->function->getParameters() as $parameter) {
             $name = strtolower($parameter->getName());
+            $type = $parameter->getType();
+
+            if ($type !== null && $type->getName() === Context::class) {
+                $args[] = $contextBuilder->build();
+                continue;
+            }
 
             if ($parameter->isOptional()) {
                 if ($input->hasOption($name)) {

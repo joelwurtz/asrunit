@@ -2,13 +2,19 @@
 
 namespace Asrunit;
 
+use Asrunit\Attribute\AsContext;
 use Asrunit\Attribute\Task;
 use Symfony\Component\Finder\Finder;
 
 class TaskFinder {
+    public function __construct(
+        private ContextRegistry $contextRegistry
+    ) {
+    }
 
-    /** @return TaskAsCommand[] */
-    public function findTasks(string $path): array
+
+    /** @return TaskBuilder|ContextBuilder[] */
+    public function findTasks(string $path): \Generator
     {
         if (\is_file($path)) {
             return $this->doFindTasks([$path]);
@@ -26,11 +32,11 @@ class TaskFinder {
     /**
      * @param iterable<string|\SplFileInfo> $files
      *
-     * @return TaskAsCommand[]
+     * @return TaskBuilder|ContextBuilder[]
      *
      * @throws \ReflectionException
      */
-    private function doFindTasks(iterable $files): array
+    private function doFindTasks(iterable $files): \Generator
     {
         $methods = [];
         $existingFunctions = \get_defined_functions()['user'];
@@ -54,7 +60,6 @@ class TaskFinder {
             foreach ($newFunctions as $functionName) {
                 $reflectionFunction = new \ReflectionFunction($functionName);
                 $attributes = $reflectionFunction->getAttributes(Task::class);
-                $test = null;
 
                 if (count($attributes) > 0) {
                     $taskAttribute = $attributes[0]->newInstance();
@@ -67,12 +72,27 @@ class TaskFinder {
                         $taskAttribute->namespace = $namespace;
                     }
 
-                    $command = new TaskAsCommand($taskAttribute, $reflectionFunction);
-                    $methods[] = $command;
+                    yield new TaskBuilder($taskAttribute, $reflectionFunction, $this->contextRegistry);
+
+                    continue;
+                }
+
+                $attributes = $reflectionFunction->getAttributes(AsContext::class);
+
+                if (count($attributes) > 0) {
+                    $contextAttribute = $attributes[0]->newInstance();
+
+                    if ($contextAttribute->name === '') {
+                        $contextAttribute->name = $reflectionFunction->getShortName();
+                    }
+
+                    if ($contextAttribute->default) {
+                        $contextAttribute->name = 'default';
+                    }
+
+                    yield new ContextBuilder($contextAttribute, $reflectionFunction);
                 }
             }
         }
-
-        return $methods;
     }
 }

@@ -34,6 +34,10 @@ class TaskAsCommand extends Command
                 continue;
             }
 
+            if ($type !== null && $type->getName() === OutputInterface::class) {
+                continue;
+            }
+
             if ($parameter->isOptional()) {
                 $this->addOption($name, null, InputOption::VALUE_OPTIONAL, '', $parameter->getDefaultValue());
             } else {
@@ -52,12 +56,20 @@ class TaskAsCommand extends Command
             throw new \Exception("Context $contextName does not exist");
         }
 
+        global $context;
+        $context = $contextBuilder->build();
+
         foreach ($this->function->getParameters() as $parameter) {
             $name = strtolower($parameter->getName());
             $type = $parameter->getType();
 
             if ($type !== null && $type->getName() === Context::class) {
-                $args[] = $contextBuilder->build();
+                $args[] = $context;
+                continue;
+            }
+
+            if ($type !== null && $type->getName() === OutputInterface::class) {
+                $args[] = $output;
                 continue;
             }
 

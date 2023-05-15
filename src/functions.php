@@ -23,10 +23,28 @@ function exec(string|array $command, ?string $workingDirectory = null,
               array $environment = [],
               array $options = []): int
 {
+    global $context;
+
+    if ($workingDirectory === null) {
+        $workingDirectory = $context->currentDirectory;
+    }
+
     $process = Process::start($command, $workingDirectory, $environment, $options);
 
     async(fn () => ByteStream\pipe($process->getStdout(), ByteStream\getStdout()));
     async(fn () => ByteStream\pipe($process->getStderr(), ByteStream\getStderr()));
 
     return $process->join();
+}
+
+function cd(string $path): void
+{
+    global $context;
+
+    // if path is absolute
+    if (strpos($path, '/') === 0) {
+        $context->currentDirectory = $path;
+    } else {
+        $context->currentDirectory = realpath($context->currentDirectory . '/' . $path);
+    }
 }

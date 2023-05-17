@@ -13,7 +13,7 @@ class TaskFinder {
     }
 
 
-    /** @return TaskBuilder|ContextBuilder[] */
+    /** @return iterable<TaskBuilder|ContextBuilder> */
     public function findTasks(string $path): \Generator
     {
         if (\is_file($path)) {
@@ -32,7 +32,7 @@ class TaskFinder {
     /**
      * @param iterable<string|\SplFileInfo> $files
      *
-     * @return TaskBuilder|ContextBuilder[]
+     * @return iterable<TaskBuilder|ContextBuilder>
      *
      * @throws \ReflectionException
      */

@@ -64,7 +64,7 @@ function exec(string|array $command, array $parameters = [], ?string $workingDir
     }
 
     $process->start(function ($type, $bytes) {
-        if ($type === \Symfony\Component\Process\Process::OUT) {
+        if ($type === Process::OUT) {
             fwrite(STDOUT, $bytes);
         } else {
             fwrite(STDERR, $bytes);

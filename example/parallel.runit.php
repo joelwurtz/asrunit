@@ -10,6 +10,9 @@ function sleep_5() {
     echo "sleep 5\n";
     exec(["sleep", "5"]);
 
+    echo "re sleep 5\n";
+    exec(["sleep", "5"]);
+
     return "foo";
 }
 

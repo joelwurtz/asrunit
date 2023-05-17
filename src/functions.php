@@ -39,7 +39,7 @@ function parallel(...$closure): array
 
 function exec(string|array $command, array $parameters = [], ?string $workingDirectory = null,
                  array $environment = [],
-                 array $options = [], $tty = false): int
+                 array $options = [], bool $tty = false, float | null $timeout = 60): int
 {
     global $context;
 
@@ -50,9 +50,9 @@ function exec(string|array $command, array $parameters = [], ?string $workingDir
     $environment = array_merge($context->environment, $environment);
 
     if (is_array($command)) {
-        $process = new Process($command, $workingDirectory, $environment, null, null);
+        $process = new Process($command, $workingDirectory, $environment, null, $timeout);
     } else {
-        $process = Process::fromShellCommandline($command, $workingDirectory, $environment, null, null);
+        $process = Process::fromShellCommandline($command, $workingDirectory, $environment, null, $timeout);
     }
 
     if ($tty) {

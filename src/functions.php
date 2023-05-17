@@ -29,6 +29,8 @@ function exec(string|array $command, ?string $workingDirectory = null,
         $workingDirectory = $context->currentDirectory;
     }
 
+    $environment = array_merge($context->environment, $environment);
+
     $process = Process::start($command, $workingDirectory, $environment, $options);
 
     async(fn () => ByteStream\pipe($process->getStdout(), ByteStream\getStdout()));

@@ -31,6 +31,7 @@ function parallel(...$closure): array
 
         if (\Fiber::getCurrent()) {
             \Fiber::suspend();
+            usleep(1_000);
         }
     }
 
@@ -60,7 +61,7 @@ function exec(string|array $command, array $parameters = [], ?string $workingDir
         $process->setInput(\STDIN);
     } else {
         $process->setPty(true);
-//        $process->setInput(\STDIN); @TODO fix this when https://github.com/symfony/symfony/pull/50354/files is merged
+        $process->setInput(\STDIN);
     }
 
     $process->start(function ($type, $bytes) {
@@ -74,6 +75,7 @@ function exec(string|array $command, array $parameters = [], ?string $workingDir
     if (\Fiber::getCurrent()) {
         while ($process->isRunning()) {
             \Fiber::suspend();
+            usleep(1_000);
         }
     }
 

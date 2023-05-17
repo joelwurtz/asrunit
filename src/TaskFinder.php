@@ -21,12 +21,20 @@ class TaskFinder {
         }
 
         $finder = Finder::create()
-            ->files()
-            ->name('*.runit.php')
+            ->directories()
+            ->ignoreDotFiles(false)
+            ->name('.castor')
             ->in($path)
         ;
 
-        return $this->doFindTasks($finder);
+        foreach ($finder as $directory) {
+            $files = Finder::create()
+                ->files()
+                ->name('*.php')
+                ->in($directory->getRealPath());
+
+            yield from $this->doFindTasks($files);
+        }
     }
 
     /**
@@ -43,10 +51,10 @@ class TaskFinder {
 
         foreach ($files as $file) {
             $path = $file;
-            $namespace = str_replace('.runit.php', '', $file);
+            $namespace = str_replace('.php', '', $file);
 
             if ($path instanceof \SplFileInfo) {
-                $namespace = $path->getBasename('.runit.php');
+                $namespace = $path->getBasename('.php');
                 $path = $path->getRealPath();
             }
 

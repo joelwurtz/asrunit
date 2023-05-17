@@ -1,8 +1,8 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\Task;
+use Castor\Attribute\Task;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[Task(description: "A simple command that use symfony style")]

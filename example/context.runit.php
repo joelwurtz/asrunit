@@ -1,10 +1,10 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\AsContext;
-use Asrunit\Attribute\Task;
-use Asrunit\Context;
+use Castor\Attribute\AsContext;
+use Castor\Attribute\Task;
+use Castor\Context;
 
 #[AsContext(name: 'production')]
 function productionContext(): Context {

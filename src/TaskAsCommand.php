@@ -1,8 +1,8 @@
 <?php
 
-namespace Asrunit;
+namespace Castor;
 
-use Asrunit\Attribute\Task as CommandAttribute;
+use Castor\Attribute\Task as CommandAttribute;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

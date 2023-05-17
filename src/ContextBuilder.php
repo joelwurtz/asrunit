@@ -1,8 +1,8 @@
 <?php
 
-namespace Asrunit;
+namespace Castor;
 
-use Asrunit\Attribute\AsContext;
+use Castor\Attribute\AsContext;
 
 class ContextBuilder
 {

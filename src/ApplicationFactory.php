@@ -1,6 +1,6 @@
 <?php
 
-namespace Asrunit;
+namespace Castor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,7 +40,7 @@ class ApplicationFactory {
             return new Context();
         })));
 
-        $application = new Application('asrunit');
+        $application = new Application('castor');
         $contextNames = implode('|', $contextRegistry->getContextsName());
 
         $inputDefinition = $application->getDefinition();

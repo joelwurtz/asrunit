@@ -1,6 +1,6 @@
 <?php
 
-namespace Asrunit;
+namespace Castor;
 
 class ContextRegistry
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Asrunit\Attribute;
+namespace Castor\Attribute;
 
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 class AsContext

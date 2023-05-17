@@ -1,9 +1,9 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\Task;
-use function Asrunit\{exec, cd};
+use Castor\Attribute\Task;
+use function Castor\{exec, cd};
 
 #[Task(description: "A simple command that changes directory")]
 function directory() {

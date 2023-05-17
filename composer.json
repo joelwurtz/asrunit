@@ -1,5 +1,5 @@
 {
-    "name": "jolicode/asrunit",
+    "name": "jolicode/castor",
     "description": "Asynchronous task runner",
     "type": "library",
     "require": {
@@ -10,7 +10,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Asrunit\\": "src/"
+            "Castor\\": "src/"
         },
         "files": ["src/functions.php"]
     },
@@ -21,6 +21,6 @@
         }
     ],
     "bin": [
-        "bin/asrunit"
+        "bin/castor"
     ]
 }

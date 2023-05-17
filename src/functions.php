@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Asrunit;
+namespace Castor;
 
 use Symfony\Component\Process\Process;
 

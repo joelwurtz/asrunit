@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use Asrunit\ApplicationFactory;
+use Castor\ApplicationFactory;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {

@@ -1,8 +1,8 @@
 <?php
 
-use Asrunit\Attribute\Task;
+use Castor\Attribute\Task;
 
 #[Task(description: "A simple task that run a bash")]
 function bash() {
-    \Asrunit\exec('bash', tty: true);
+    \Castor\exec('bash', tty: true);
 }

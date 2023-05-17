@@ -1,10 +1,10 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\Task;
-use function Asrunit\exec;
-use function Asrunit\parallel;
+use Castor\Attribute\Task;
+use function Castor\exec;
+use function Castor\parallel;
 
 function sleep_5() {
     echo "sleep 5\n";

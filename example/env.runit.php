@@ -1,11 +1,11 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\AsContext;
-use Asrunit\Attribute\Task;
-use Asrunit\Context;
-use function Asrunit\exec;
+use Castor\Attribute\AsContext;
+use Castor\Attribute\Task;
+use Castor\Context;
+use function Castor\exec;
 
 #[AsContext(name: 'context_env')]
 function context_env(): Context {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\Task;
-use function Asrunit\exec;
+use Castor\Attribute\Task;
+use function Castor\exec;
 
 #[Task(description: "This a task with arguments")]
 function args(string $test, int $test2 = 1) {

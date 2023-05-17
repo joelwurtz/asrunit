@@ -1,8 +1,8 @@
 <?php
 
-namespace Asrunit\Example;
+namespace Castor\Example;
 
-use Asrunit\Attribute\Task;
+use Castor\Attribute\Task;
 
 #[Task(description: "A simple command that prints foo")]
 function foo() {

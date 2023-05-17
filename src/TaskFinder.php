@@ -1,9 +1,9 @@
 <?php
 
-namespace Asrunit;
+namespace Castor;
 
-use Asrunit\Attribute\AsContext;
-use Asrunit\Attribute\Task;
+use Castor\Attribute\AsContext;
+use Castor\Attribute\Task;
 use Symfony\Component\Finder\Finder;
 
 class TaskFinder {

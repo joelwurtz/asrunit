@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Asrunit;
 
+use Symfony\Component\Process\Process;
+
 function parallel(...$closure): array
 {
     $fibers = [];
@@ -35,9 +37,9 @@ function parallel(...$closure): array
     return array_map(fn ($fiber) => $fiber->getReturn(), $fibers);
 }
 
-function exec(array $command, array $parameters = [], ?string $workingDirectory = null,
+function exec(string|array $command, array $parameters = [], ?string $workingDirectory = null,
                  array $environment = [],
-                 array $options = []): int
+                 array $options = [], $tty = false): int
 {
     global $context;
 
@@ -46,9 +48,20 @@ function exec(array $command, array $parameters = [], ?string $workingDirectory 
     }
 
     $environment = array_merge($context->environment, $environment);
-    $process = new \Symfony\Component\Process\Process($command, $workingDirectory, $environment, null, null);
-    $process->setPty(true);
-    // $process->setInput(\STDIN); @TODO new to fix a bug in symfony/process in order to use stdin with pty
+
+    if (is_array($command)) {
+        $process = new Process($command, $workingDirectory, $environment, null, null);
+    } else {
+        $process = Process::fromShellCommandline($command, $workingDirectory, $environment, null, null);
+    }
+
+    if ($tty) {
+        $process->setTty(true);
+        $process->setInput(\STDIN);
+    } else {
+        $process->setPty(true);
+//        $process->setInput(\STDIN); @TODO fix this when https://github.com/symfony/symfony/pull/50354/files is merged
+    }
 
     $process->start(function ($type, $bytes) {
         if ($type === \Symfony\Component\Process\Process::OUT) {

@@ -2,7 +2,7 @@
 
 namespace Castor;
 
-use Castor\Attribute\Task as CommandAttribute;
+use Castor\Attribute\Task;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,20 +12,21 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class TaskAsCommand extends Command
 {
-    public function __construct(private CommandAttribute $commandAttribute, private \ReflectionFunction $function, private ContextRegistry $contextRegistry)
+    public function __construct(Task $taskAttribute, private \ReflectionFunction $function, private ContextRegistry $contextRegistry)
     {
-        $commandName = $commandAttribute->name;
+        $commandName = $taskAttribute->name;
 
-        if ($commandAttribute->namespace !== null && $commandAttribute->namespace !== '') {
-            $commandName = $commandAttribute->namespace . ':' . $commandName;
+        if ($taskAttribute->namespace !== null && $taskAttribute->namespace !== '') {
+            $commandName = $taskAttribute->namespace . ':' . $commandName;
         }
 
         parent::__construct($commandName);
+
+        $this->setDescription($taskAttribute->description);
     }
 
     protected function configure(): void
     {
-        $this->setDescription($this->commandAttribute->description);
 
         foreach ($this->function->getParameters() as $parameter) {
             $name = strtolower($parameter->getName());

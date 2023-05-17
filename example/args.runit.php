@@ -7,5 +7,5 @@ use function Asrunit\exec;
 
 #[Task(description: "This a task with arguments")]
 function args(string $test, int $test2 = 1) {
-    exec("echo $test $test2");
+    exec(["echo", $test, $test2]);
 }

@@ -4,24 +4,40 @@ declare(strict_types=1);
 
 namespace Asrunit;
 
-use Amp\Process\Process;
-use Amp\ByteStream;
-use function Amp\async;
-use function Amp\Future\await;
-
 function parallel(...$closure): array
 {
-    $promises = [];
+    $fibers = [];
     foreach ($closure as $item) {
-        $promises[] = async($item);
+        $fiber = new \Fiber($item);
+        $fiber->start();
+
+        $fibers[] = $fiber;
     }
 
-    return await($promises);
+    $isRunning = true;
+
+    while ($isRunning) {
+        $isRunning = false;
+
+        foreach ($fibers as $fiber) {
+            $isRunning = $isRunning || !$fiber->isTerminated();
+
+            if (!$fiber->isTerminated() && $fiber->isSuspended()) {
+                $fiber->resume();
+            }
+        }
+
+        if (\Fiber::getCurrent()) {
+            \Fiber::suspend();
+        }
+    }
+
+    return array_map(fn ($fiber) => $fiber->getReturn(), $fibers);
 }
 
-function exec(string|array $command, ?string $workingDirectory = null,
-              array $environment = [],
-              array $options = []): int
+function exec(array $command, array $parameters = [], ?string $workingDirectory = null,
+                 array $environment = [],
+                 array $options = []): int
 {
     global $context;
 
@@ -30,13 +46,25 @@ function exec(string|array $command, ?string $workingDirectory = null,
     }
 
     $environment = array_merge($context->environment, $environment);
+    $process = new \Symfony\Component\Process\Process($command, $workingDirectory, $environment, null, null);
+    $process->setPty(true);
+    // $process->setInput(\STDIN); @TODO new to fix a bug in symfony/process in order to use stdin with pty
 
-    $process = Process::start($command, $workingDirectory, $environment, $options);
+    $process->start(function ($type, $bytes) {
+        if ($type === \Symfony\Component\Process\Process::OUT) {
+            fwrite(STDOUT, $bytes);
+        } else {
+            fwrite(STDERR, $bytes);
+        }
+    });
 
-    async(fn () => ByteStream\pipe($process->getStdout(), ByteStream\getStdout()));
-    async(fn () => ByteStream\pipe($process->getStderr(), ByteStream\getStderr()));
+    if (\Fiber::getCurrent()) {
+        while ($process->isRunning()) {
+            \Fiber::suspend();
+        }
+    }
 
-    return $process->join();
+    return $process->wait();
 }
 
 function cd(string $path): void

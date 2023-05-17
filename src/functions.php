@@ -4,24 +4,42 @@ declare(strict_types=1);
 
 namespace Asrunit;
 
-use Amp\Process\Process;
-use Amp\ByteStream;
-use function Amp\async;
-use function Amp\Future\await;
+use Symfony\Component\Process\Process;
 
 function parallel(...$closure): array
 {
-    $promises = [];
+    $fibers = [];
     foreach ($closure as $item) {
-        $promises[] = async($item);
+        $fiber = new \Fiber($item);
+        $fiber->start();
+
+        $fibers[] = $fiber;
     }
 
-    return await($promises);
+    $isRunning = true;
+
+    while ($isRunning) {
+        $isRunning = false;
+
+        foreach ($fibers as $fiber) {
+            $isRunning = $isRunning || !$fiber->isTerminated();
+
+            if (!$fiber->isTerminated() && $fiber->isSuspended()) {
+                $fiber->resume();
+            }
+        }
+
+        if (\Fiber::getCurrent()) {
+            \Fiber::suspend();
+        }
+    }
+
+    return array_map(fn ($fiber) => $fiber->getReturn(), $fibers);
 }
 
-function exec(string|array $command, ?string $workingDirectory = null,
-              array $environment = [],
-              array $options = []): int
+function exec(string|array $command, array $parameters = [], ?string $workingDirectory = null,
+                 array $environment = [],
+                 array $options = [], bool $tty = false, float | null $timeout = 60): int
 {
     global $context;
 
@@ -31,12 +49,35 @@ function exec(string|array $command, ?string $workingDirectory = null,
 
     $environment = array_merge($context->environment, $environment);
 
-    $process = Process::start($command, $workingDirectory, $environment, $options);
+    if (is_array($command)) {
+        $process = new Process($command, $workingDirectory, $environment, null, $timeout);
+    } else {
+        $process = Process::fromShellCommandline($command, $workingDirectory, $environment, null, $timeout);
+    }
 
-    async(fn () => ByteStream\pipe($process->getStdout(), ByteStream\getStdout()));
-    async(fn () => ByteStream\pipe($process->getStderr(), ByteStream\getStderr()));
+    if ($tty) {
+        $process->setTty(true);
+        $process->setInput(\STDIN);
+    } else {
+        $process->setPty(true);
+//        $process->setInput(\STDIN); @TODO fix this when https://github.com/symfony/symfony/pull/50354/files is merged
+    }
 
-    return $process->join();
+    $process->start(function ($type, $bytes) {
+        if ($type === \Symfony\Component\Process\Process::OUT) {
+            fwrite(STDOUT, $bytes);
+        } else {
+            fwrite(STDERR, $bytes);
+        }
+    });
+
+    if (\Fiber::getCurrent()) {
+        while ($process->isRunning()) {
+            \Fiber::suspend();
+        }
+    }
+
+    return $process->wait();
 }
 
 function cd(string $path): void
